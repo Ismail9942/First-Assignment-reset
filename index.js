@@ -69,38 +69,56 @@ const allCategories = async () => {
   const btnContainer = document.getElementById("btn-container");
   btnContainer.textContent = "";
 
-  // All button create
-  const allBtn = document.createElement("button");
-  allBtn.innerText = "All";
-  allBtn.className = "px-4 py-2 bg-blue-500 text-white rounded m-2";
+  // All button
+  const categoriesWithAll = ["all", ...categories];
 
-  allBtn.addEventListener("click", loadData);
-  btnContainer.appendChild(allBtn);
-  categories.forEach((category) => {
+  categoriesWithAll.forEach((category) => {
     const button = document.createElement("button");
 
-    button.innerText = category.charAt(0).toUpperCase() + category.slice(1);
+    // CATEGORY NAME SET
+    const displayName =
+      category === "all"
+        ? "All"
+        : category.charAt(0).toUpperCase() + category.slice(1);
 
+    button.innerText = displayName;
     button.className = "px-4 py-2 bg-gray-200 rounded m-2 category-btn";
+    button.dataset.category = category;
 
+    // EVENT HANDLER
     button.addEventListener("click", async () => {
+      // CLASS REMOVE
       document.querySelectorAll(".category-btn").forEach((btn) => {
         btn.classList.remove("bg-blue-500", "text-white");
         btn.classList.add("bg-gray-200");
       });
 
+      // ACTIVE CLASS ADDED
       button.classList.add("bg-blue-500", "text-white");
       button.classList.remove("bg-gray-200");
 
-      const res = await fetch(
-        `https://fakestoreapi.com/products/category/${category}`,
-      );
-      const data = await res.json();
-      displayProducts(data, "all-products-container");
+      const category = button.dataset.category;
+
+      // LOAD FUNCTION ADDED
+      if (category === "all") {
+        loadData();
+      } else {
+        // CETEGORIES API LOADED
+        const res = await fetch(
+          `https://fakestoreapi.com/products/category/${category}`,
+        );
+        const data = await res.json();
+        displayProducts(data, "all-products-container");
+      }
     });
 
     btnContainer.appendChild(button);
   });
+
+  // ALL DATA LOADED
+  setTimeout(() => {
+    document.querySelector('[data-category="all"]').click();
+  }, 100);
 };
 
 loadData();
